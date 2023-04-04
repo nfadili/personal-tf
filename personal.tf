@@ -5,7 +5,7 @@ resource "digitalocean_project" "personal" {
   name        = "personal"
   environment = "Development"
   resources = [
-    digitalocean_kubernetes_cluster.personal_cluster.urn,
+    digitalocean_kubernetes_cluster.personal_kubernetes_cluster.urn,
     digitalocean_database_cluster.personal_database_cluster.urn
   ]
 }
