@@ -145,7 +145,6 @@ resource "kubernetes_ingress_v1" "albumranker_ingress" {
   }
   spec {
     ingress_class_name = "nginx"
-    host               = "albumranker.com"
     rule {
       http {
         path {
