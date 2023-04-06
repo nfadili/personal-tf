@@ -105,36 +105,7 @@ resource "helm_release" "personal_certmanager" {
 # https://stackoverflow.com/questions/68511476/setup-letsencrypt-clusterissuer-with-terraform
 # - Applying here would require the cluster to already be created before applying
 # - Applying with other kubernetes resources put the onus on the app deployment to manager cert issuing
-resource "kubernetes_manifest" "clusterissuer_letsencrypt_prod" {
-  depends_on = [
-    helm_release.personal_certmanager
-  ]
-  manifest = {
-    "apiVersion" = "cert-manager.io/v1"
-    "kind"       = "ClusterIssuer"
-    "metadata" = {
-      "name" = "letsencrypt-prod"
-    }
-    "spec" = {
-      "acme" = {
-        "email" = "safe.salt4183@fastmail.com"
-        "privateKeySecretRef" = {
-          "name" = "letsencrypt-prod"
-        }
-        "server" = "https://acme-v02.api.letsencrypt.org/directory"
-        "solvers" = [
-          {
-            "http01" = {
-              "ingress" = {
-                "class" = "nginx"
-              }
-            }
-          }
-        ]
-      }
-    }
-  }
-}
+
 
 #####################################
 # Albumranker resources 
