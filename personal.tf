@@ -164,7 +164,7 @@ resource "kubernetes_ingress" "albumranker_ingress" {
   ]
   metadata {
     name      = "albumranker-ingress"
-    namespace = kubernetes_namespace.albumranker_namespace.metadata.name
+    namespace = kubernetes_namespace.albumranker_namespace.metadata[0].name
     annotations = {
       "kubernetes.io/ingress.class"          = "nginx"
       "ingress.kubernetes.io/rewrite-target" = "/"
