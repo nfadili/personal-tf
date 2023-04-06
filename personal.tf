@@ -110,7 +110,7 @@ resource "helm_release" "personal_certmanager" {
 #####################################
 # Albumranker resources 
 #####################################
-resource "kubernetes_namespace" "albumranker_namespace" {
+resource "kubernetes_namespace_v1" "albumranker_namespace" {
   metadata {
     name = "albumranker"
   }
@@ -132,7 +132,7 @@ resource "digitalocean_record" "albumranker_a_record" {
   ]
 }
 
-resource "kubernetes_ingress" "albumranker_ingress" {
+resource "kubernetes_ingress_v1" "albumranker_ingress" {
   depends_on = [
     helm_release.personal_nginx_ingress_controller,
   ]
@@ -140,20 +140,23 @@ resource "kubernetes_ingress" "albumranker_ingress" {
     name      = "albumranker-ingress"
     namespace = kubernetes_namespace.albumranker_namespace.metadata[0].name
     annotations = {
-      "kubernetes.io/ingress.class"          = "nginx"
-      "ingress.kubernetes.io/rewrite-target" = "/"
-      "cert-manager.io/cluster-issuer"       = "letsencrypt-production"
+      "cert-manager.io/cluster-issuer" = "letsencrypt-production"
     }
   }
   spec {
+    ingress_class_name = "nginx"
+    host               = "albumranker.com"
     rule {
-      host = "albumranker.com"
       http {
         path {
-          path = "/"
+          path = "/*"
           backend {
-            service_name = "albumranker-com-service"
-            service_port = 80
+            service {
+              name = "albumranker-com-service"
+              port {
+                number = 80
+              }
+            }
           }
         }
       }
