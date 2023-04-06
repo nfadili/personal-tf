@@ -128,7 +128,7 @@ resource "digitalocean_record" "albumranker_a_record" {
   value  = digitalocean_loadbalancer.personal_kubernetes_ingress_loadbalancer.ip
   depends_on = [
     digitalocean_domain.albumranker_domain,
-    kubernetes_ingress.albumranker_ingress
+    kubernetes_ingress_v1.albumranker_ingress
   ]
 }
 
@@ -138,7 +138,7 @@ resource "kubernetes_ingress_v1" "albumranker_ingress" {
   ]
   metadata {
     name      = "albumranker-ingress"
-    namespace = kubernetes_namespace.albumranker_namespace.metadata[0].name
+    namespace = kubernetes_namespace_v1.albumranker_namespace.metadata[0].name
     annotations = {
       "cert-manager.io/cluster-issuer" = "letsencrypt-production"
     }
