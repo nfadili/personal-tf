@@ -53,6 +53,9 @@ resource "digitalocean_loadbalancer" "personal_kubernetes_ingress_loadbalancer" 
     ]
   }
 
+  depends_on = [
+    digitalocean_kubernetes_cluster.personal_kubernetes_cluster
+  ]
 }
 
 #####################################
@@ -86,7 +89,7 @@ resource "helm_release" "personal_certmanager" {
   namespace  = "kube-system"
   timeout    = 120
   depends_on = [
-    kubernetes_ingress.personal_kubernetes_cluster,
+    helm_release.personal_nginx_ingress_controller,
   ]
   set {
     name  = "createCustomResource"
@@ -154,7 +157,7 @@ resource "digitalocean_record" "albumranker_a_record" {
   value  = digitalocean_loadbalancer.personal_kubernetes_ingress_loadbalancer.ip
   depends_on = [
     digitalocean_domain.albumranker_domain,
-    kubernetes_ingress.personal_kubernetes_ingress_loadbalancer
+    kubernetes_ingress.albumranker_ingress
   ]
 }
 
