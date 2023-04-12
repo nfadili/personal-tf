@@ -88,9 +88,6 @@ resource "helm_release" "personal_certmanager" {
   version    = "v1.11.0"
   namespace  = "kube-system"
   timeout    = 120
-  depends_on = [
-    helm_release.personal_nginx_ingress_controller,
-  ]
   set {
     name  = "createCustomResource"
     value = "true"
@@ -100,12 +97,6 @@ resource "helm_release" "personal_certmanager" {
     value = "true"
   }
 }
-
-# TODO: Figure out if we should apply the ClusterIssuer manifest here in terraform or alongside other kubernetes resources
-# https://stackoverflow.com/questions/68511476/setup-letsencrypt-clusterissuer-with-terraform
-# - Applying here would require the cluster to already be created before applying
-# - Applying with other kubernetes resources put the onus on the app deployment to manager cert issuing
-
 
 #####################################
 # Albumranker resources 
@@ -127,46 +118,8 @@ resource "digitalocean_record" "albumranker_a_record" {
   name   = "@"
   value  = digitalocean_loadbalancer.personal_kubernetes_ingress_loadbalancer.ip
   depends_on = [
-    digitalocean_domain.albumranker_domain,
-    kubernetes_ingress_v1.albumranker_ingress
+    digitalocean_domain.albumranker_domain
   ]
-}
-
-resource "kubernetes_ingress_v1" "albumranker_ingress" {
-  depends_on = [
-    helm_release.personal_nginx_ingress_controller,
-  ]
-  metadata {
-    name      = "albumranker-ingress"
-    namespace = kubernetes_namespace_v1.albumranker_namespace.metadata[0].name
-    annotations = {
-      "cert-manager.io/cluster-issuer" = "letsencrypt-production"
-    }
-  }
-  spec {
-    ingress_class_name = "nginx"
-    rule {
-      http {
-        path {
-          path = "/*"
-          backend {
-            service {
-              name = "albumranker-com-service"
-              port {
-                number = 80
-              }
-            }
-          }
-        }
-      }
-    }
-    tls {
-      secret_name = "albumranker-com-tls"
-      hosts = [
-        "albumranker.com"
-      ]
-    }
-  }
 }
 
 resource "digitalocean_database_db" "personal_database_albumranker" {
